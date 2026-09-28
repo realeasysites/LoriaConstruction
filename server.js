@@ -1,0 +1,50 @@
+'use strict';
+
+require('dotenv').config();
+const path = require('path');
+const express = require('express');
+
+const { db } = require('./db');
+const { sendMail } = require('./lib/mailer');
+const { requireAdminPage } = require('./lib/auth');
+const apiRoutes = require('./routes/api');
+const adminRoutes = require('./routes/admin');
+const mountInstantEstimate = require('./instant-estimate');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.set('trust proxy', 1);
+app.disable('x-powered-by');
+app.use(express.json({ limit: '50kb' }));
+
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.set('X-Frame-Options', 'SAMEORIGIN');
+  next();
+});
+
+// Instant Estimate: /estimate page, /api/instant-estimate/*, /admin/estimates, /admin/estimate-pricing
+mountInstantEstimate(app, {
+  business: {
+    name: 'Loria Construction',
+    phone: '(585) 727-8149',
+    email: 'loriaconstruction585@gmail.com',
+    color: '#0f2a4a'
+  },
+  db,
+  sendMail,
+  requireAdmin: requireAdminPage,
+  pagePath: '/#estimate'
+});
+
+app.use('/api/admin', adminRoutes.api);
+app.use('/api', apiRoutes);
+app.use('/admin', adminRoutes.pages);
+
+app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'], maxAge: '7d', index: 'index.html' }));
+
+app.use((req, res) => res.status(404).sendFile(path.join(__dirname, 'public', '404.html')));
+
+app.listen(PORT, () => console.log(`Loria Construction site running on http://localhost:${PORT}`));
