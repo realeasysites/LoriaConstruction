@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Instant Estimates</title>
+  <link rel="stylesheet" href="/instant-estimate/admin.css">
+  <style>
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin: 18px 0; }
+    .stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+    .stat b { display: block; font-size: 1.6rem; }
+    .stat span { color: var(--mut); font-size: .85rem; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .filters button { font: inherit; border: 1.5px solid var(--line); background: #fff; border-radius: 99px; padding: 6px 14px; cursor: pointer; }
+    .filters button.on { border-color: var(--a); color: var(--a); font-weight: 700; }
+    .lead { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; }
+    .lead.hot { border-left: 5px solid var(--hot); }
+    .top { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+    .who { margin-right: auto; }
+    .who h3 { margin: 0; font-size: 1.1rem; }
+    .who .mut { font-size: .88rem; }
+    .who a { color: var(--ink); }
+    .range { font-size: 1.25rem; font-weight: 800; text-align: right; }
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; margin-top: 4px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; font-size: .92rem; }
+    .kv { display: grid; grid-template-columns: 110px 1fr; gap: 3px 10px; }
+    .kv dt { color: var(--mut); }
+    .kv dd { margin: 0; font-weight: 600; }
+    .visit { background: #fff5f5; border-radius: 8px; padding: 10px 12px; }
+    .actions { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; flex-wrap: wrap; }
+    .actions textarea { flex: 1; min-width: 220px; min-height: 38px; }
+    details { margin-top: 10px; font-size: .88rem; }
+    details table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+    details td { border-bottom: 1px solid var(--line); padding: 4px 0; }
+    details td:last-child { text-align: right; }
+    .empty { text-align: center; padding: 50px 10px; color: var(--mut); background: #fff; border-radius: 12px; border: 1px dashed var(--line); }
+    @media (max-width: 700px) { .stats { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: 1fr; } .range { text-align: left; } .badges { justify-content: flex-start; } }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>Instant Estimate</strong>
+    <a href="/admin/estimates" class="on">Leads</a>
+    <a href="/admin/estimate-pricing">Pricing</a>
+    <a href="/instant-estimate/" target="_blank" rel="noopener">View form ↗</a>
+    <a href="/admin">← Main dashboard</a>
+  </header>
+  <main>
+    <h1>Estimate leads</h1>
+    <div class="mut">🔥 = saw the ballpark and still asked for a site visit. Call these first.</div>
+    <div class="stats" id="stats"></div>
+    <div class="filters" id="filters"></div>
+    <div id="list"></div>
+  </main>
+  <div class="toast" id="toast"></div>
+<script>
+(function () {
+  var all = [], statuses = [], rates = null, filter = 'all';
+  var STATUS_LABEL = { new: 'New', contacted: 'Contacted', visit_scheduled: 'Visit scheduled', won: 'Won', lost: 'Lost' };
+  var $ = function (id) { return document.getElementById(id); };
+  function h(tag, attrs, kids) {
+    var el = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      var v = attrs[k]; if (v == null || v === false) return;
+      if (k === 'class') el.className = v; else if (k === 'text') el.textContent = v;
+      else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), v); else el.setAttribute(k, v);
+    });
+    (kids || []).forEach(function (c) { if (c != null) el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return el;
+  }
+  function money(n) { return '$' + Number(n).toLocaleString('en-US'); }
+  function lbl(list, key) { var o = (list || []).find(function (x) { return x.key === key; }); return o ? o.label : '—'; }
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(function () { t.classList.remove('show'); }, 1800); }
+  function when(s) { if (!s) return ''; var d = new Date(s.replace(' ', 'T') + 'Z'); return d.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
+  function post(url, body) { return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) }).then(function (r) { return r.json(); }); }
+
+  function load() {
+    Promise.all([
+      fetch('/admin/api/estimates').then(function (r) { return r.json(); }),
+      rates ? Promise.resolve({ rates: rates }) : fetch('/admin/api/estimate-rates').then(function (r) { return r.json(); })
+    ]).then(function (res) { all = res[0].estimates || []; statuses = res[0].statuses || []; rates = res[1].rates; render(); });
+  }
+
+  function render() {
+    var hot = all.filter(function (e) { return e.tier === 'visit_requested'; });
+    var open = hot.filter(function (e) { return e.status === 'new'; });
+    var won = all.filter(function (e) { return e.status === 'won'; });
+    $('stats').innerHTML = '';
+    [[all.length, 'Estimates run'], [hot.length, '🔥 Visit requests'], [open.length, 'Hot & not yet contacted'],
+     [all.length ? Math.round(hot.length / all.length * 100) + '%' : '—', 'Asked for a visit']].forEach(function (s) {
+      $('stats').appendChild(h('div', { class: 'stat' }, [h('b', { text: String(s[0]) }), h('span', { text: s[1] })]));
+    });
+
+    $('filters').innerHTML = '';
+    [['all', 'All (' + all.length + ')'], ['visit_requested', '🔥 Visit requested (' + hot.length + ')'],
+     ['price_only', 'Price viewed only (' + (all.length - hot.length) + ')'], ['gap', '⚠️ Budget gap']].forEach(function (f) {
+      $('filters').appendChild(h('button', { class: filter === f[0] ? 'on' : '', onclick: function () { filter = f[0]; render(); }, text: f[1] }));
+    });
+
+    var rows = all.filter(function (e) {
+      if (filter === 'all') return true;
+      if (filter === 'gap') return e.budget_gap;
+      return e.tier === filter;
+    });
+    var list = $('list'); list.innerHTML = '';
+    if (!rows.length) { list.appendChild(h('div', { class: 'empty', text: all.length ? 'Nothing in this view.' : 'No estimates yet. They\'ll show up here as soon as someone uses the form.' })); return; }
+    rows.forEach(function (e) { list.appendChild(leadCard(e)); });
+  }
+
+  function leadCard(e) {
+    var a = e.answers, isHot = e.tier === 'visit_requested';
+    var extras = [];
+    if (a.steps) extras.push(a.steps + ' step' + (a.steps > 1 ? 's' : ''));
+    if (a.seatWallFt) extras.push(a.seatWallFt + ' ft seat wall');
+    if (a.firePit) extras.push('fire pit pad');
+
+    var status = h('select', { 'aria-label': 'Status', onchange: function () { save(e.id, { status: status.value }); } },
+      statuses.map(function (s) { var o = h('option', { value: s, text: STATUS_LABEL[s] || s }); if (s === e.status) o.selected = true; return o; }));
+    var notes = h('textarea', { placeholder: 'Your notes (call log, measurements…)', rows: '1' }); notes.value = e.admin_notes || '';
+    var bd = e.breakdown || {};
+
+    return h('div', { class: 'lead' + (isHot ? ' hot' : '') }, [
+      h('div', { class: 'top' }, [
+        h('div', { class: 'who' }, [
+          h('h3', { text: e.name }),
+          h('div', { class: 'mut' }, [
+            e.phone ? h('a', { href: 'tel:' + e.phone.replace(/[^\d+]/g, ''), text: e.phone }) : null, e.phone ? ' · ' : '',
+            h('a', { href: 'mailto:' + e.email, text: e.email }), e.town ? ' · ' + e.town : '', ' · ' + when(e.created_at)
+          ])
+        ]),
+        h('div', {}, [
+          h('div', { class: 'range', text: money(e.estimate_low) + ' – ' + money(e.estimate_high) }),
+          h('div', { class: 'badges' }, [
+            isHot ? h('span', { class: 'badge b-hot', text: '🔥 Visit requested' }) : h('span', { class: 'badge b-cold', text: 'Price viewed only' }),
+            e.budget_gap ? h('span', { class: 'badge b-warn', text: '⚠️ Budget gap' }) : null
+          ])
+        ])
+      ]),
+      h('div', { class: 'grid' }, [
+        h('dl', { class: 'kv' }, [
+          h('dt', { text: 'Project' }), h('dd', { text: a.projectType === 'replace' ? 'Replace existing' : 'New patio' }),
+          h('dt', { text: 'Size' }), h('dd', { text: a.sqft + ' sq ft' + (a.length ? ' (' + a.length + '′ × ' + a.width + '′)' : '') }),
+          h('dt', { text: 'Finish' }), h('dd', { text: lbl(rates.finishes, a.finish) }),
+          h('dt', { text: 'Access' }), h('dd', { text: lbl(rates.access, a.access) }),
+          h('dt', { text: 'Ground' }), h('dd', { text: lbl(rates.slope, a.slope) }),
+          h('dt', { text: 'Extras' }), h('dd', { text: extras.join(', ') || 'None' })
+        ]),
+        h('div', {}, [
+          h('dl', { class: 'kv' }, [
+            h('dt', { text: 'Budget' }), h('dd', { text: a.budget ? lbl(rates.budgets, a.budget) : 'Not given' }),
+            h('dt', { text: 'Timeline' }), h('dd', { text: a.timeline ? lbl(rates.timelines, a.timeline) : 'Not given' })
+          ]),
+          isHot ? h('div', { class: 'visit', style: 'margin-top:10px' }, [
+            h('strong', { text: 'Site visit: ' }), (e.visit_days || 'Any day') + ' · ' + (e.visit_time || 'Any time'),
+            e.visit_notes ? h('div', { class: 'mut', text: '“' + e.visit_notes + '”' }) : null
+          ]) : null
+        ])
+      ]),
+      h('details', {}, [
+        h('summary', { text: 'How the number was built' }),
+        h('table', {}, (bd.lines || []).map(function (l) { return h('tr', {}, [h('td', { text: l.label }), h('td', { text: money(l.amount) })]); })
+          .concat([h('tr', {}, [h('td', {}, [h('strong', { text: 'Calculated' })]), h('td', {}, [h('strong', { text: money(bd.midpoint || 0) })])])])),
+        e.mail_status ? h('div', { class: 'mut', style: 'margin-top:6px', text: 'Emails: ' + e.mail_status }) : null
+      ]),
+      h('div', { class: 'actions' }, [
+        status, notes,
+        h('button', { class: 'btn small', onclick: function () { save(e.id, { admin_notes: notes.value }); }, text: 'Save notes' }),
+        h('button', { class: 'btn small ghost', onclick: function () {
+          if (!confirm('Delete this estimate permanently?')) return;
+          post('/admin/api/estimates/' + e.id + '/delete').then(function () { toast('Deleted'); load(); });
+        }, text: 'Delete' })
+      ])
+    ]);
+  }
+
+  function save(id, body) {
+    post('/admin/api/estimates/' + id, body).then(function (r) { toast(r.ok ? 'Saved' : 'Could not save'); if (r.ok) load(); });
+  }
+  load();
+})();
+</script>
+</body>
+</html>
