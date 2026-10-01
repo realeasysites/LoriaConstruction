@@ -10,8 +10,8 @@ const router = express.Router();
 const clip = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');
 
 const SERVICES = [
-  'Stamped concrete patio', 'Pool deck', 'Driveway / walkway / steps', 'Stone veneer',
-  'Masonry / chimney repair', 'Tile / bathroom', 'Commercial project', 'Something else'
+  'Stamped concrete patio', 'Pool deck', 'Driveway / walkway / steps', 'Masonry / stone veneer',
+  'Garage or pole barn floor', 'Tile / bathroom', 'Commercial project', 'Something else'
 ];
 const TIMELINES = ['As soon as possible', 'Within 1–3 months', 'Next season', 'Just planning'];
 

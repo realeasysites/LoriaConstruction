@@ -25,19 +25,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// Instant Estimate: /estimate page, /api/instant-estimate/*, /admin/estimates, /admin/estimate-pricing
-mountInstantEstimate(app, {
-  business: {
-    name: 'Loria Construction',
-    phone: '(585) 727-8149',
-    email: 'loriaconstruction585@gmail.com',
-    color: '#0f2a4a'
-  },
-  db,
-  sendMail,
-  requireAdmin: requireAdminPage,
-  pagePath: '/#estimate'
-});
+// Online estimates run through CreteQuote (embedded via public/crete-quote.html).
+// The built-in Instant Estimate module is kept but switched off. To use it instead,
+// set INSTANT_ESTIMATE=on and put <div id="instant-estimate"></div> + ie.js back on the page.
+if (process.env.INSTANT_ESTIMATE === 'on') {
+  mountInstantEstimate(app, {
+    business: { name: 'Loria Construction', phone: '(585) 727-8149', email: 'loriaconstruction585@gmail.com', color: '#0f2a4a' },
+    db,
+    sendMail,
+    requireAdmin: requireAdminPage,
+    pagePath: '/#estimate'
+  });
+}
 
 app.use('/api/admin', adminRoutes.api);
 app.use('/api', apiRoutes);

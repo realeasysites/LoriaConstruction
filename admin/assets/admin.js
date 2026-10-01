@@ -92,7 +92,7 @@
     }).join('') : '<p class="empty">No messages here yet. New contact-form messages from the website will show up here.</p>';
 
     var ie = state.ie || {};
-    $('#ieNums').innerHTML =
+    if ($('#ieNums')) $('#ieNums').innerHTML =
       '<div><b>' + (ie.total || 0) + '</b><span>Run</span></div>' +
       '<div class="hot"><b>' + (ie.hot || 0) + '</b><span>🔥 Visits</span></div>' +
       '<div class="hot"><b>' + (ie.hotNew || 0) + '</b><span>Not called</span></div>';

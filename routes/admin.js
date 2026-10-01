@@ -43,8 +43,11 @@ api.get('/leads', (req, res) => {
   const leads = stmts.listLeads.all().map(shape);
   const counts = Object.fromEntries(STATUSES.map((s) => [s, 0]));
   for (const r of stmts.statusCounts.all()) counts[r.status] = r.n;
-  const ie = db.prepare(`SELECT COUNT(*) AS total, SUM(tier = 'visit_requested') AS hot,
-    SUM(tier = 'visit_requested' AND status = 'new') AS hotNew FROM ie_estimates`).get();
+  let ie = {};
+  try {
+    ie = db.prepare(`SELECT COUNT(*) AS total, SUM(tier = 'visit_requested') AS hot,
+      SUM(tier = 'visit_requested' AND status = 'new') AS hotNew FROM ie_estimates`).get();
+  } catch (e) { /* Instant Estimate module is off */ }
   res.json({ leads, counts, statuses: STATUSES, estimates: { total: ie.total || 0, hot: ie.hot || 0, hotNew: ie.hotNew || 0 } });
 });
 
