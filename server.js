@@ -42,7 +42,12 @@ app.use('/api/admin', adminRoutes.api);
 app.use('/api', apiRoutes);
 app.use('/admin', adminRoutes.pages);
 
-app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'], maxAge: '7d', index: 'index.html' }));
+// Pages always revalidate so edits show right away; assets cache for 7 days
+// (they're versioned with ?v=... in the HTML, so bump that when a file changes).
+app.use(express.static(path.join(__dirname, 'public'), {
+  extensions: ['html'], maxAge: '7d', index: 'index.html',
+  setHeaders: (res, filePath) => { if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache'); }
+}));
 
 app.use((req, res) => res.status(404).sendFile(path.join(__dirname, 'public', '404.html')));
 

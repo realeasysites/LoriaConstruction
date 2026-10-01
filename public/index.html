@@ -21,9 +21,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="/img/hero-walk-poster.jpg" media="(min-width: 700px)">
-  <link rel="preload" as="image" href="/img/hero-walk-poster-sm.jpg" media="(max-width: 699px)">
-  <link rel="stylesheet" href="/css/site.css">
+  <link rel="preload" as="image" href="/img/hero-walk-poster.jpg?v=20260930b" media="(min-width: 700px)">
+  <link rel="preload" as="image" href="/img/hero-walk-poster-sm.jpg?v=20260930b" media="(max-width: 699px)">
+  <link rel="stylesheet" href="/css/site.css?v=20260930b">
 
   <script type="application/ld+json">
   {
@@ -94,12 +94,12 @@
 <section class="hero">
   <div class="hero-media" id="heroMedia">
     <picture class="hero-bg">
-      <source media="(max-width: 699px)" srcset="/img/hero-walk-poster-sm.jpg">
-      <img src="/img/hero-walk-poster.jpg" alt="Gray ashlar stamped concrete patio and walkway around a stone-faced home" width="1280" height="720" fetchpriority="high">
+      <source media="(max-width: 699px)" srcset="/img/hero-walk-poster-sm.jpg?v=20260930b">
+      <img src="/img/hero-walk-poster.jpg?v=20260930b" alt="Gray ashlar stamped concrete patio and walkway around a stone-faced home" width="1280" height="720" fetchpriority="high">
     </picture>
     <!-- Hero video reel: list clips in order. "sm" = lighter file for phones.
          Leave the list empty to show the photo only. -->
-    <div class="hero-videos" id="heroVideos" aria-hidden="true" data-clips='[{"src":"/video/hero-walk.mp4","sm":"/video/hero-walk-sm.mp4"}]'></div>
+    <div class="hero-videos" id="heroVideos" aria-hidden="true" data-clips='[{"src":"/video/hero-walk.mp4?v=20260930b","sm":"/video/hero-walk-sm.mp4?v=20260930b"}]'></div>
   </div>
   <div class="hero-shade" aria-hidden="true"></div>
   <div class="wrap hero-inner">
@@ -213,7 +213,7 @@
   <div class="wrap build-grid">
     <figure class="build-video">
       <div class="bv-frame">
-        <video id="buildVideo" src="/video/how-we-build.mp4" poster="/img/how-we-build-poster.jpg" muted loop playsinline preload="none" aria-label="A Loria Construction stamped patio, start to finish"></video>
+        <video id="buildVideo" src="/video/how-we-build.mp4?v=20260930b" poster="/img/how-we-build-poster.jpg?v=20260930b" muted loop playsinline preload="none" aria-label="A Loria Construction stamped patio, start to finish"></video>
         <button class="bv-sound" id="buildSound" type="button" aria-pressed="false">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           <span>Sound on</span>
@@ -705,7 +705,7 @@
   <button class="lb-next" aria-label="Next photo">›</button>
 </div>
 
-<script src="/js/gallery-data.js" defer></script>
-<script src="/js/site.js" defer></script>
+<script src="/js/gallery-data.js?v=20260930b" defer></script>
+<script src="/js/site.js?v=20260930b" defer></script>
 </body>
 </html>
