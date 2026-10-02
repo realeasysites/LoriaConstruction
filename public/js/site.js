@@ -116,6 +116,77 @@
     });
   }
 
+  /* ---------- Quick-answer helper (no AI: every answer is Loria's own wording) ---------- */
+  (function () {
+    var home = location.pathname === '/' || location.pathname === '/index.html';
+    var to = function (hash) { return (home ? '' : '/') + hash; };
+    var A = {
+      call: { label: 'Call (585) 727-8149', href: 'tel:+15857278149' },
+      msg: { label: 'Message on Facebook', href: 'https://m.me/loriaconstruction585', ext: true },
+      est: { label: 'Get my instant estimate', href: to('#estimate'), primary: true },
+      form: { label: 'Send a message', href: to('#contact') },
+      colors: { label: 'See the color chart', href: to('#faq-colors'), primary: true },
+      area: { label: 'See the towns we serve', href: to('#area') },
+      build: { label: 'Watch how we build it', href: to('#build'), primary: true },
+      work: { label: 'See our work', href: '/gallery', primary: true }
+    };
+    var QA = [
+      { q: 'Is the estimate free?', a: 'Yes, it\'s free. We come out in person so every measurement is right, and we can answer your questions on the spot.', act: ['est', 'call'] },
+      { q: 'What will my project cost?', a: 'Every job is different, so your real price comes from the free on-site visit. Want a ballpark first? The Instant Estimate takes about a minute.', act: ['est', 'call'] },
+      { q: 'What colors can I pick?', a: 'Lots. Integral colors are mixed right into the concrete, and release agents add an accent color in the stamped texture for a natural-stone look.', act: ['colors'] },
+      { q: 'Do you work in my town?', a: 'We typically work within about 30 miles of Rochester, NY, and travel further for larger jobs.', act: ['area', 'call'] },
+      { q: 'Are you insured?', a: 'Yes, fully insured. We keep proof of insurance on site while we work and can email it to you too.', act: ['call'] },
+      { q: 'What do you build?', a: 'Stamped and decorative concrete, patios, pool decks, walkways, steps, driveways, pole barn and garage floors, brick, block, stone veneer, foundations, retaining walls and tile.', act: ['work'] },
+      { q: 'How do you build a patio?', a: 'We dig out and haul away the old surface, lay a crushed-stone base, set a 2′ × 2′ rebar grid, and pour 4"+ of 4,000 PSI concrete. Then it\'s finished by hand.', act: ['build'] },
+      { q: 'Talk to a person', a: 'We\'re available Monday to Saturday, 8am to 5pm. Call for the fastest answer, or send a message anytime.', act: ['call', 'msg', 'form'] }
+    ];
+
+    var wrap = document.createElement('div'); wrap.className = 'qa';
+    wrap.innerHTML =
+      '<div class="qa-panel" id="qaPanel" role="dialog" aria-label="Quick answers" hidden>' +
+        '<div class="qa-head"><div><b>Quick answers</b><small>Loria Construction</small></div>' +
+        '<button type="button" class="qa-x" aria-label="Close">×</button></div>' +
+        '<div class="qa-log" aria-live="polite"><p class="qa-bot">Hi! Pick a question below. For anything else, give us a call.</p></div>' +
+        '<div class="qa-chips"></div>' +
+      '</div>' +
+      '<button type="button" class="qa-btn" aria-expanded="false" aria-controls="qaPanel">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 9.5h8M8 12.5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' +
+        '<span>Questions?</span></button>';
+    document.body.appendChild(wrap);
+    var panel = $('.qa-panel', wrap), btn = $('.qa-btn', wrap), log = $('.qa-log', wrap), chips = $('.qa-chips', wrap);
+
+    QA.forEach(function (item, i) {
+      var c = document.createElement('button'); c.type = 'button'; c.className = 'qa-chip'; c.textContent = item.q;
+      c.addEventListener('click', function () { answer(i); });
+      chips.appendChild(c);
+    });
+
+    function answer(i) {
+      var item = QA[i];
+      var q = document.createElement('p'); q.className = 'qa-me'; q.textContent = item.q;
+      var a = document.createElement('div'); a.className = 'qa-bot';
+      var t = document.createElement('p'); t.textContent = item.a; a.appendChild(t);
+      var acts = document.createElement('div'); acts.className = 'qa-acts';
+      item.act.forEach(function (k) {
+        var d = A[k], l = document.createElement('a');
+        l.href = d.href; l.textContent = d.label; l.className = 'qa-act' + (d.primary ? ' is-primary' : '');
+        if (d.ext) { l.target = '_blank'; l.rel = 'noopener'; }
+        if (d.href.charAt(0) === '#' ) l.addEventListener('click', function () { close(); openTarget(d.href); });
+        acts.appendChild(l);
+      });
+      a.appendChild(acts);
+      log.appendChild(q); log.appendChild(a);
+      log.scrollTop = log.scrollHeight;
+    }
+    function openTarget(hash) { var el = document.querySelector(hash); if (el && el.tagName === 'DETAILS') el.open = true; }
+    function open() { panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); wrap.classList.add('is-open'); $('.qa-chip', wrap).focus(); }
+    function close() { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); wrap.classList.remove('is-open'); }
+    btn.addEventListener('click', function () { if (panel.hidden) open(); else { close(); btn.focus(); } });
+    $('.qa-x', wrap).addEventListener('click', function () { close(); btn.focus(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) { close(); btn.focus(); } });
+    if (location.hash === '#faq-colors') openTarget('#faq-colors');
+  })();
+
   /* ---------- "How we build it" video: play in view, sound toggle ---------- */
   var bv = $('#buildVideo'), bs = $('#buildSound');
   if (bv) {
