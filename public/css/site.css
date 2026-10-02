@@ -411,6 +411,9 @@ p { margin: 0 0 1em; }
 .faq summary::after { content: '+'; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; background: var(--copper-100); color: var(--copper-600); display: grid; place-items: center; font-size: 1.2rem; transition: transform .2s; }
 .faq details[open] summary::after { content: '−'; }
 .faq details p { padding: 0 20px 18px; margin: 0; color: var(--muted); }
+.faq-colors { display: block; margin: 0 20px 20px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); position: relative; }
+.faq-colors img { display: block; width: 100%; height: auto; }
+.faq-colors span { position: absolute; right: 10px; bottom: 10px; background: rgba(8, 18, 34, .82); color: #fff; font-size: .8rem; font-weight: 600; padding: 6px 10px; border-radius: 999px; }
 
 /* contact */
 .contact-section { background: var(--navy-900); color: #dbe3ee; }
