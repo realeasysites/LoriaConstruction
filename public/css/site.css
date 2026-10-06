@@ -80,7 +80,7 @@ p { margin: 0 0 1em; }
 
 /* ---------- eyebrow + compass motif ---------- */
 .eyebrow { display: inline-flex; align-items: center; gap: 10px; font: 700 .8rem/1.2 var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--copper-600); margin: 0 0 14px; }
-.eyebrow.light { color: #e8b393; }
+.eyebrow.light { color: #d9673f; }
 .compass {
   width: 18px; height: 18px; flex: none; background: currentColor;
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 0l3 13 13 3-13 3-3 13-3-13L0 16l13-3z'/%3E%3Cpath d='M16 6l1.6 8.4L26 16l-8.4 1.6L16 26l-1.6-8.4L6 16l8.4-1.6z' transform='rotate(45 16 16)' opacity='.55'/%3E%3C/svg%3E") center/contain no-repeat;
