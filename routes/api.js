@@ -18,8 +18,9 @@ const TIMELINES = ['As soon as possible', 'Within 1–3 months', 'Next season', 
 router.post('/contact', rateLimit({ windowMs: 15 * 60 * 1000, max: 8 }), (req, res) => {
   const b = req.body || {};
 
-  // Honeypot: real people never fill the hidden "company" field.
-  if (b.company) return res.json({ ok: true });
+  // Honeypot: real people never fill the hidden "lc_trap" field.
+  // (Named so browsers don't autofill it; a field called "company" got autofilled and real leads were dropped.)
+  if (b.lc_trap) return res.json({ ok: true });
 
   const name = clip(b.name, 100);
   const phone = clip(b.phone, 40);
