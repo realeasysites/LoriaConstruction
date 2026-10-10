@@ -64,7 +64,7 @@ All photos are Loria's own, from the owner's folder. Two privacy edits were made
 To swap a video, replace the file with the same name (H.264 MP4, keep it under ~5 MB).
 
 ## Before launch
-- [ ] **Persistent disk**: Render → Disks → 1 GB at `/var/data`, then `DB_PATH=/var/data/loria.sqlite`. Without it, every deploy wipes the leads and the traffic history. Export the leads CSV first.
+- [x] **Persistent disk**: 1 GB at `/var/data` (added Oct 10). `db/index.js` uses `/var/data/loria.sqlite` automatically when the disk is mounted; the deploy log prints which path is in use.
 
 - [ ] After the domain moves, run one CreteQuote estimate on the live site and confirm it shows up in his CreteQuote account.
 - [ ] `ADMIN_PASSWORD` set.

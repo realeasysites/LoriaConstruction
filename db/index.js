@@ -1,10 +1,15 @@
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
 
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'loria.sqlite');
+// Render's persistent disk is mounted at /var/data. Anything outside it is wiped on every deploy,
+// so use the disk automatically when it exists (DB_PATH in the environment still wins).
+const DISK = '/var/data';
+const DB_PATH = process.env.DB_PATH || (fs.existsSync(DISK) ? path.join(DISK, 'loria.sqlite') : path.join(__dirname, 'loria.sqlite'));
 const db = new Database(DB_PATH);
+console.log(`[db] SQLite at ${DB_PATH}${DB_PATH.startsWith(DISK) ? ' (persistent disk)' : ' (NOT persistent: wiped on each deploy)'}`);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
