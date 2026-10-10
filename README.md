@@ -21,6 +21,7 @@ Stamped concrete and masonry site for **Loria Construction LLC** (East Rochester
   - Contact-form lead pipeline: New → Contacted → Visit scheduled → Quoted → Won / Lost, with notes, tap-to-call/text and CSV export
   - Instant Estimates panel linking to the estimate leads and pricing pages
 - **One SMTP setup** powers both the contact form and the estimate emails.
+- **Website traffic** (`site-analytics/`): visitors, page views, traffic sources, devices and call/text taps at the top of `/admin`, next to the leads. Cookieless, skips bots and the owner's own admin visits. See `site-analytics/README.md`.
 
 ```
 server.js              thin entry point
@@ -31,7 +32,8 @@ lib/rateLimit.js       spam/abuse protection
 routes/api.js          POST /api/contact
 routes/admin.js        /admin page + /api/admin/*
 admin/                 dashboard UI
-instant-estimate/      drop-in estimate module
+instant-estimate/      drop-in estimate module (off)
+site-analytics/        drop-in traffic tracking + dashboard panel
 public/                the website
 ```
 
@@ -62,6 +64,7 @@ All photos are Loria's own, from the owner's folder. Two privacy edits were made
 To swap a video, replace the file with the same name (H.264 MP4, keep it under ~5 MB).
 
 ## Before launch
+- [ ] **Persistent disk**: Render → Disks → 1 GB at `/var/data`, then `DB_PATH=/var/data/loria.sqlite`. Without it, every deploy wipes the leads and the traffic history. Export the leads CSV first.
 
 - [ ] After the domain moves, run one CreteQuote estimate on the live site and confirm it shows up in his CreteQuote account.
 - [ ] `ADMIN_PASSWORD` set.

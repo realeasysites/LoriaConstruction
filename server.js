@@ -6,10 +6,11 @@ const express = require('express');
 
 const { db } = require('./db');
 const { sendMail } = require('./lib/mailer');
-const { requireAdminPage } = require('./lib/auth');
+const { requireAdminPage, requireAdmin, isAuthed } = require('./lib/auth');
 const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
 const mountInstantEstimate = require('./instant-estimate');
+const mountSiteAnalytics = require('./site-analytics');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,6 +38,9 @@ if (process.env.INSTANT_ESTIMATE === 'on') {
     pagePath: '/#estimate'
   });
 }
+
+// Website traffic: page views, visitors, sources and call/text taps, shown on the /admin dashboard.
+mountSiteAnalytics(app, { db, isAuthed, requireAdmin, timezone: 'America/New_York' });
 
 app.use('/api/admin', adminRoutes.api);
 app.use('/api', apiRoutes);

@@ -76,7 +76,9 @@ a { color: var(--gold-deep); }
 .hint { color: var(--muted); font-size: .84rem; }
 
 @media (max-width: 960px) {
-  .dash-grid { grid-template-columns: 1fr; }
+  .dash-grid { grid-template-columns: minmax(0, 1fr); }
+  .filters input { min-width: 0; }
+  .filters select { max-width: 45%; }
   .stats { grid-template-columns: repeat(3, 1fr); }
   .lead.open .lead-body { grid-template-columns: 1fr; }
   .filters { width: 100%; }
@@ -85,6 +87,9 @@ a { color: var(--gold-deep); }
 @media (max-width: 520px) {
   .stats { grid-template-columns: repeat(2, 1fr); }
   .tb-brand span { display: none; }
+  .topbar { padding: 10px 12px; }
+  .tb-actions { flex-wrap: wrap; justify-content: flex-end; gap: 6px 12px; }
+  .tb-actions a { font-size: .85rem; }
   .dash { padding: 12px; }
 }
 
