@@ -48,6 +48,14 @@ app.use('/admin', adminRoutes.pages);
 
 // Pages always revalidate so edits show right away; assets cache for 7 days
 // (they're versioned with ?v=... in the HTML, so bump that when a file changes).
+// One address for search engines: send the bare domain to www (keeps the path).
+app.use((req, res, next) => {
+  if ((req.headers.host || '').toLowerCase() === 'loriaconstruction.com') {
+    return res.redirect(301, 'https://www.loriaconstruction.com' + req.originalUrl);
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public'), {
   extensions: ['html'], maxAge: '7d', index: 'index.html',
   setHeaders: (res, filePath) => { if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache'); }
