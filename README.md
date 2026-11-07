@@ -8,7 +8,7 @@ Stamped concrete and masonry site for **Loria Construction LLC** (East Rochester
   - Hero: "Concrete *Character*." over a looping walk-around patio video (`video/hero-walk.mp4`, a 540×960 version for phones), with the night walkway photo as the poster and fallback
   - "Loria Signature" stamped-concrete section (patterns, borders, medallions)
   - **Four finishes**: stamped, traditional brushed, brushed with a stamped border, finished floors (pole barns and garages)
-  - **How we build it**: the owner's process video, featured large (plays when scrolled into view, with a Sound on button), next to a cross-section of the build: excavate and haul away, crushed-stone base, 2′×2′ rebar grid, 4"+ of 4,000 PSI concrete, hand-finished surface. Plus expansion joints along all masonry and multi-pour stoops and larger patios
+  - **How we build it**: the owner's process video, featured large (plays when scrolled into view, with a Sound on button), next to a cross-section of the build: excavate and haul away, crushed-stone base, 2′×2′ rebar grid, 5"+ of 4,000 PSI concrete, hand-finished surface. Plus expansion joints along all masonry and multi-pour stoops and larger patios
   - Services (no chimney work is advertised anywhere, per the owner's insurance)
   - Homepage gallery with **job-type tabs** (Patios, Walkways, Pool Decks, Driveways, Stone, Tile, Detail, Commercial, Crew). "All" shows 12 hand-picked shots; each tab shows 8 from that category and links to the full set
   - Full gallery page (`/gallery`) with 154 photos, filter tabs and a lightbox; `/gallery#pool` etc. opens on that tab

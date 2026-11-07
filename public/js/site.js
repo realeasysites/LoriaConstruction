@@ -137,7 +137,7 @@
       { q: 'Do you work in my town?', a: 'We typically work within about 30 miles of Rochester, NY, and travel further for larger jobs.', act: ['area', 'call'] },
       { q: 'Are you insured?', a: 'Yes, fully insured. We keep proof of insurance on site while we work and can email it to you too.', act: ['call'] },
       { q: 'What do you build?', a: 'Stamped and decorative concrete, patios, pool decks, walkways, steps, driveways, pole barn and garage floors, brick, block, stone veneer, foundations, retaining walls and tile.', act: ['work'] },
-      { q: 'How do you build a patio?', a: 'We dig out and haul away the old surface, lay a crushed-stone base, set a 2′ × 2′ rebar grid, and pour 4"+ of 4,000 PSI concrete. Then it\'s finished by hand.', act: ['build'] },
+      { q: 'How do you build a patio?', a: 'We dig out and haul away the old surface, lay a crushed-stone base, set a 2′ × 2′ rebar grid, and pour 5"+ of 4,000 PSI concrete. Then it\'s finished by hand.', act: ['build'] },
       { q: 'Talk to a person', a: 'We\'re available Monday to Saturday, 8am to 5pm. Call for the fastest answer, or send a message anytime.', act: ['call', 'msg', 'form'] }
     ];
 
